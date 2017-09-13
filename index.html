@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>细胞自动机</title>
+	<script src="https://cdn.bootcss.com/vue/2.1.10/vue.min.js"></script>
+	<link rel="stylesheet" href="./main.css">
+</head>
+<body>
+	<div id="app">
+		<div class="container">
+			<div class="row" v-for="(row,i) in map">
+				<div class="item" v-for="(item,j) in row" @click="change(i,j)" v-bind:class="bgSeletor(item)">
+				</div>
+			</div>
+			<div class="control">
+				<button @click="loopStart">Switch</button>
+				<input type="text" v-model="speed">
+			</div>
+		</div>	
+	</div>
+</body>
+<script>
+	Vue.config.debug = true;
+	Vue.config.devtools = true;
+	const ins = new Vue({
+		el: "#app",
+		data: {
+			cleanData: Array(30).fill(Array(30).fill(0)).map((i) => i.map((j) => 0)),
+			//map: Array(30).fill(Array(30).fill(0)),
+			map: Array(30).fill(Array(30).fill(0)).map((i) => i.map((j) => 0)),
+			running: false,
+			speed: 100
+		},
+		watch: {
+			// map(value) {
+			// 	console.log(1, value);
+			// }
+		},
+		methods:{
+			change(i,j){
+				this.chgStatus(i,j,this.map[i][j] ? 0 :1 )
+			},
+			chgStatus(i,j,status){
+				this.$set(this.map[i],j,status)
+			},
+			bgSeletor(item) {
+				if(item) {
+					return "choosen"
+				}else{
+					return "empty"
+				}
+			},
+			loopStart(){
+				const _this = this
+				_this.running = !this.running
+				if(this.running) {
+					let bundle = setInterval(function(){
+						//自动机开始
+						if(!_this.running){
+							clearInterval(bundle)
+						}else{
+							console.log(_this.map[1])
+							_this.map = _this.createCeil(_this.map)
+
+						}
+					},this.speed)
+				}else{
+					console.log(42)
+				}
+				
+			},
+			createCeil(ceils){
+				let new_ceil 	= 	Array(30).fill(Array(30).fill(0)).map((i) => i.map((j) => 0))
+				let cnt 		=	0;	
+				for(let i = 1;i < ceils.length - 1;i++) {
+					for(let j = 1;j < ceils[i].length - 1; j++) {
+						cnt  	=	ceils[i-1][j-1] + ceils[i][j-1] +
+									ceils[i+1][j-1] + ceils[i-1][j]	+
+									ceils[i+1][j] 	+ ceils[i-1][j+1] + 
+									ceils[i][j+1]	+ ceils[i+1][j+1]
+
+						if(ceils[i][j] == 1 && cnt < 2) {
+							new_ceil[i][j] = 0
+						}else if(ceils[i][j] == 1 && (cnt == 2 || cnt == 3)) {
+							new_ceil[i][j] = ceils[i][j]
+						}else if(ceils[i][j] == 1 && cnt > 3) {
+							new_ceil[i][j] = 0
+						}else if(ceils[i][j] == 0 && cnt == 3) {
+							new_ceil[i][j] = 1
+						}
+						cnt = 0;
+					}
+				}
+				return new_ceil;
+			}
+		}
+	});
+</script>
+</html>

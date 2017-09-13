@@ -1,0 +1,26 @@
+.container{
+	width: 510px;
+	background-color: #eee;
+	border: 1px solid red;
+	margin: 0 auto;
+}
+
+.row{
+	height: 15px;
+}
+
+.item{
+	width: 15px;
+	height: 15px;
+	display: inline-block;
+	border: 1px solid red; 
+	cursor: pointer;
+}
+
+.item:not(:first-child){
+	border-top: none;
+}
+
+.choosen{
+	background-color: black;
+}
